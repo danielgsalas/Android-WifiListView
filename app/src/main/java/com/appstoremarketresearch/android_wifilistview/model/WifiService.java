@@ -5,40 +5,43 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import com.appstoremarketresearch.android_wifilistview.notification.WifiDataReceiver;
+
+import java.util.AbstractSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * WifiService
  */
 public class WifiService implements Runnable {
 
-    private WifiListener    mWifiListener;
     private WifiManager     mWifiManager;
 
-    private boolean mKeepRunning;
-    private long    mSleepMilliseconds = 2000;
+    private boolean mKeepRunning = true;
+    private long    mSleepMilliseconds = 3000;
+
+    private static AbstractSet<WifiDataReceiver> mListeners =
+            new CopyOnWriteArraySet<>();
 
     /**
      * WifiService
      */
-    public WifiService(
-        Context context,
-        WifiListener wifiListener) {
-
-        this.mWifiListener = wifiListener;
+    public WifiService(Context context) {
         this.mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
     /**
-     * notifyWifiListener
+     * notifyWifiDataReceivers
      */
-    private void notifyWifiListener() {
-        if (mWifiListener != null) {
-            List<WifiConfiguration> networks = mWifiManager.getConfiguredNetworks();
-            mWifiListener.onGetConfiguredNetworks(networks);
+    private void notifyWifiDataReceivers() {
 
-            WifiInfo info = mWifiManager.getConnectionInfo();
-            mWifiListener.onGetConnectionInfo(info);
+        List<WifiConfiguration> networks = mWifiManager.getConfiguredNetworks();
+        WifiInfo info = mWifiManager.getConnectionInfo();
+
+        for (WifiDataReceiver listener : mListeners) {
+            listener.onGetConfiguredNetworks(networks);
+            listener.onGetConnectionInfo(info);
         }
     }
 
@@ -47,7 +50,7 @@ public class WifiService implements Runnable {
 
         while (mKeepRunning) {
             try {
-                notifyWifiListener();
+                notifyWifiDataReceivers();
                 Thread.sleep(mSleepMilliseconds);
             }
             catch (InterruptedException ex) {
@@ -61,5 +64,23 @@ public class WifiService implements Runnable {
      */
     public void stop() {
         mKeepRunning = false;
+    }
+
+    /**
+     * subscribe
+     */
+    public static void subscribe(WifiDataReceiver listener) {
+        if (listener != null) {
+            mListeners.add(listener);
+        }
+    }
+
+    /**
+     * unsubscribe
+     */
+    public static void unsubscribe(WifiDataReceiver listener) {
+        if (listener != null) {
+            mListeners.remove(listener);
+        }
     }
 }
