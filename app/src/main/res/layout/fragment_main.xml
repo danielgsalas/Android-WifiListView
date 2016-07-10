@@ -9,4 +9,10 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.appstoremarketresearch.android_wifilistview.view.MainFragment">
 
+    <com.appstoremarketresearch.android_wifilistview.view.WifiListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifiListView"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

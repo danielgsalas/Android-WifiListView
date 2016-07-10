@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp" >
+
+    <ImageView
+        android:id="@+id/networkImage"
+        android:layout_width="@dimen/wifi_icon_size"
+        android:layout_height="@dimen/wifi_icon_size"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/network_wifi_icon" />
+
+    <TextView
+        android:id="@+id/networkTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toLeftOf="@id/networkImage"
+        android:gravity="center_vertical"
+        android:textSize="18dp" />
+
+</RelativeLayout>
