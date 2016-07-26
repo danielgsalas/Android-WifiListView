@@ -57,7 +57,7 @@ public class MainFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        // stop listening for connectivity events
+        // stop listening for network information
         mWifiService.unsubscribe(mWifiArrayAdapter);
         mWifiService.stop();
 
