@@ -3,11 +3,16 @@ package com.appstoremarketresearch.android_wifilistview.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appstoremarketresearch.android_wifilistview.controller.MainActivity;
 import com.appstoremarketresearch.android_wifilistview.notification.NetworkConnectivityListener;
@@ -22,11 +27,14 @@ public class WifiListView
 {
     private TextView mHeader;
 
+    private static final String LOG_TAG = WifiListView.class.getSimpleName();
+
     /**
      * WifiListView
      */
     public WifiListView(Context context) {
         super(context);
+        initializeOnItemClickListener();
     }
 
     /**
@@ -36,6 +44,7 @@ public class WifiListView
         Context context,
         AttributeSet attrs) {
         super(context, attrs);
+        initializeOnItemClickListener();
     }
 
     /**
@@ -46,6 +55,7 @@ public class WifiListView
         AttributeSet attrs,
         int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initializeOnItemClickListener();
     }
 
     /**
@@ -75,6 +85,35 @@ public class WifiListView
         mHeader.setLayoutParams(params);
 
         this.addHeaderView(mHeader);
+    }
+
+    /**
+     * initializeOnItemClickListener
+     */
+    private void initializeOnItemClickListener() {
+        this.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(
+                AdapterView<?> parent,
+                View view,
+                int position,
+                long id) {
+
+                Object item = WifiListView.this.getItemAtPosition(position);
+
+                if (item instanceof WifiConfiguration) {
+                    WifiConfiguration network = (WifiConfiguration)item;
+                    String networkName = new String(network.SSID).replace("\"", "").replace("\"", "");
+                    Toast.makeText(getContext(), networkName, Toast.LENGTH_LONG).show();
+                }
+                else if (item != null) {
+                    Log.e(LOG_TAG, "Unexpected item type: " + item.getClass().getSimpleName());
+                }
+                else {
+                    Log.e(LOG_TAG, "Item is null at position " + position);
+                }
+            }
+        });
     }
 
     @Override
