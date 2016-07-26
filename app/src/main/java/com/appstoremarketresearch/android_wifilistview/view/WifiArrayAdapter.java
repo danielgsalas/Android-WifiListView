@@ -46,9 +46,7 @@ public class WifiArrayAdapter
         mActivity = activity;
     }
 
-    /**
-     * getView
-     */
+    @Override
     public View getView (
         int position,
         View convertView,
@@ -65,7 +63,14 @@ public class WifiArrayAdapter
             Log.e(LOG_TAG, "No network found for position " + position);
         }
         else {
-            showNetworkName(network, rowView);
+            String networkName = new String(network.SSID).replace("\"", "").replace("\"", "");
+
+            if (isConnectedToWifi() && isCurrentNetwork(network)) {
+                networkName += " (CONNECTED)";
+            }
+
+            TextView textview = (TextView)rowView.findViewById(R.id.networkTitle);
+            textview.setText(networkName);
         }
 
         return rowView;
@@ -88,9 +93,7 @@ public class WifiArrayAdapter
                mCurrentNetwork.getSSID().equals(network.SSID);
     }
 
-    /**
-     * onGetConfiguredNetworks
-     */
+    @Override
     public void onGetConfiguredNetworks(final List<WifiConfiguration> networks) {
 
         if (networks == null || networks.size() == 0) {
@@ -120,34 +123,19 @@ public class WifiArrayAdapter
         });
     }
 
-    /**
-     * onGetConnectionInfo
-     */
+    @Override
     public void onGetConnectionInfo(WifiInfo info) {
         mCurrentNetwork = info;
     }
 
-
     @Override
     public void onNetworkConnectivityChanged(NetworkInfo.State state) {
-        mNetworkState = state;
-        this.notifyDataSetChanged();
-    }
 
-    /**
-     * showNetworkName
-     */
-    private void showNetworkName(
-        WifiConfiguration network,
-        View rowView) {
-
-        String networkName = new String(network.SSID).replace("\"", "").replace("\"", "");
-
-        if (isConnectedToWifi() && isCurrentNetwork(network)) {
-            networkName += " (CONNECTED)";
+        if (state != NetworkInfo.State.CONNECTED) {
+          mCurrentNetwork = null;
         }
 
-        TextView textview = (TextView)rowView.findViewById(R.id.networkTitle);
-        textview.setText(networkName);
+        mNetworkState = state;
+        this.notifyDataSetChanged();
     }
 }
